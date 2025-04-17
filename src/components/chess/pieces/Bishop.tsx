@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Position } from '@/types/chess'
 
-function Pawn({ 
+function Bishop({ 
   position, 
   color, 
   isSelected, 
@@ -33,7 +33,7 @@ function Pawn({
       onPointerEnter={() => setIsHovered(true)}
       onPointerLeave={() => setIsHovered(false)}
     >
-      {/* Base of pawn */}
+      {/* Base of bishop */}
       <cylinderGeometry args={[0.3, 0.4, 0.2, 8]} />
       <meshStandardMaterial 
         color={color} 
@@ -41,9 +41,9 @@ function Pawn({
         emissiveIntensity={isHovered || isSelected || isCaptureable ? 0.5 : 0}
       />
       
-      {/* Body of pawn */}
+      {/* Body of bishop */}
       <mesh position={[0, 0.4, 0]}>
-        <cylinderGeometry args={[0.2, 0.3, 0.6, 8]} />
+        <cylinderGeometry args={[0.2, 0.2, 0.8, 8]} />
         <meshStandardMaterial 
           color={color}
           emissive="yellow"
@@ -51,9 +51,9 @@ function Pawn({
         />
       </mesh>
       
-      {/* Head of pawn */}
-      <mesh position={[0, 0.8, 0]}>
-        <sphereGeometry args={[0.2, 16, 8]} />
+      {/* Top of bishop */}
+      <mesh position={[0, 1.2, 0]}>
+        <coneGeometry args={[.18, 0.6, 8]} />
         <meshStandardMaterial 
           color={color}
           emissive="yellow"
@@ -64,4 +64,4 @@ function Pawn({
   )
 }
 
-export default Pawn
+export default Bishop

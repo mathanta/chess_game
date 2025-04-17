@@ -1,9 +1,13 @@
-// src/components/chess/Board.tsx
 import { useState } from 'react'
 import { BoardState, Position, PiecePosition } from '@/types/chess'
 import Square from './Square'
 import Pawn from './pieces/Pawn'
-import { boardToPosition, getValidPawnMoves } from '@/utils/chessLogic'
+import Rook from './pieces/Rook'
+import Knight from './pieces/Knight'
+import Bishop from './pieces/Bishop'
+import King from './pieces/King'
+import Queen from './pieces/Queen'
+import { boardToPosition, getValidMoves } from '@/utils/chessLogic'
 
 function Board() {
     // Initialize 8x8 board with squares
@@ -27,14 +31,114 @@ function Board() {
         ...[...Array(8)].map((_, i) => ({
             id: `white-pawn-${i}`,
             position: [i - 3.5, 0.1, 2.5] as Position,
-            color: 'white' as const
+            color: 'white' as const,
+            type: 'pawn' as const
         })),
         // Black pawns
         ...[...Array(8)].map((_, i) => ({
             id: `black-pawn-${i}`,
             position: [i - 3.5, 0.1, -2.5] as Position,
-            color: 'black' as const
-        }))
+            color: 'black' as const,
+            type: 'pawn' as const
+        })),
+        // White pieces
+        {
+            id: 'white-rook-0',
+            position: [-3.5, 0.1, 3.5] as Position,
+            color: 'white' as const,
+            type: 'rook' as const
+        },
+        {
+            id: 'white-knight-0',
+            position: [-2.5, 0.1, 3.5] as Position,
+            color: 'white' as const,
+            type: 'knight' as const
+    },
+        {
+            id: 'white-bishop-0',
+            position: [-1.5, 0.1, 3.5] as Position,
+            color: 'white' as const,
+            type: 'bishop' as const
+        },
+        {
+            id: 'white-king',
+            position: [0.5, 0.1, 3.5] as Position,
+            color: 'white' as const,
+            type: 'king' as const
+        },
+        {
+            id: 'white-queen',
+            position: [-0.5, 0.1, 3.5] as Position,
+            color: 'white' as const,
+            type: 'queen' as const
+        },
+        {
+            id: 'white-bishop-1',
+            position: [1.5, 0.1, 3.5] as Position,
+            color: 'white' as const,
+            type: 'bishop' as const
+        },
+        {
+            id: 'white-knight-1',
+            position: [2.5, 0.1, 3.5] as Position,
+            color: 'white' as const,
+            type: 'knight' as const
+        },
+        {
+            id: 'white-rook-1',
+            position: [3.5, 0.1, 3.5] as Position,
+            color: 'white' as const,
+            type: 'rook' as const
+        },
+        // Black pieces
+        {
+            id: 'black-rook-0',
+            position: [-3.5, 0.1, -3.5] as Position,
+            color: 'black' as const,
+            type: 'rook' as const
+        },
+        {
+            id: 'black-knight-0',
+            position: [-2.5, 0.1, -3.5] as Position,
+            color: 'black' as const,
+            type: 'knight' as const
+        },
+        {
+            id: 'black-bishop-0',
+            position: [-1.5, 0.1, -3.5] as Position,
+            color: 'black' as const,
+            type: 'bishop' as const
+        },
+        {
+            id: 'black-king',
+            position: [-0.5, 0.1, -3.5] as Position,
+            color: 'black' as const,
+            type: 'king' as const
+        },
+        {
+            id: 'black-queen',
+            position: [0.5, 0.1, -3.5] as Position,
+            color: 'black' as const,
+            type: 'queen' as const
+        },
+        {
+            id: 'black-bishop-1',
+            position: [1.5, 0.1, -3.5] as Position,
+            color: 'black' as const,
+            type: 'bishop' as const
+        },
+        {
+            id: 'black-knight-1',
+            position: [2.5, 0.1, -3.5] as Position,
+            color: 'black' as const,
+            type: 'knight' as const
+        },
+        {
+            id: 'black-rook-1',
+            position: [3.5, 0.1, -3.5] as Position,
+            color: 'black' as const,
+            type: 'rook' as const
+        }
     ])
 
     const [selectedPiece, setSelectedPiece] = useState<string | null>(null)
@@ -60,7 +164,7 @@ function Board() {
                 updateHighlights([])
             } else {
                 setSelectedPiece(pieceId)
-                const validMoves = getValidPawnMoves(piece, pieces)
+                const validMoves = getValidMoves(piece, pieces)
                 updateHighlights(validMoves)
             }
         }
@@ -122,30 +226,43 @@ function Board() {
             )}
 
             {/* Pieces */}
-      // in Board.tsx, in the pieces.map:
             {pieces.map((piece) => {
                 const validMoves = selectedPiece ?
-                    getValidPawnMoves(pieces.find(p => p.id === selectedPiece)!, pieces) :
+                    getValidMoves(pieces.find(p => p.id === selectedPiece)!, pieces) :
                     []
 
-                const isCaptureable = !!(selectedPiece && // Use !! to ensure boolean
+                const isCaptureable = !!(selectedPiece &&
                     selectedPiece !== piece.id &&
                     validMoves.some(move =>
                         move[0] === piece.position[0] &&
                         move[2] === piece.position[2]
                     ))
 
-                return (
-                    <Pawn
-                        key={piece.id}
-                        position={piece.position}
-                        color={piece.color}
-                        isSelected={selectedPiece === piece.id}
-                        onSelect={() => handlePieceSelect(piece.id)}
-                        isCaptureable={isCaptureable}
-                        onCapture={() => handleMove(piece.position)}
-                    />
-                )
+                const commonProps = {
+                    position: piece.position,
+                    color: piece.color,
+                    isSelected: selectedPiece === piece.id,
+                    onSelect: () => handlePieceSelect(piece.id),
+                    isCaptureable: isCaptureable,
+                    onCapture: () => handleMove(piece.position)
+                }
+
+                switch (piece.type) {
+                    case 'pawn':
+                        return <Pawn key={piece.id} {...commonProps} />
+                    case 'rook':
+                        return <Rook key={piece.id} {...commonProps} />
+                    case 'knight':
+                        return <Knight key={piece.id} {...commonProps} />
+                    case 'bishop':
+                        return <Bishop key={piece.id} {...commonProps} />
+                    case 'king':
+                        return <King key={piece.id} {...commonProps} />
+                    case 'queen':
+                        return <Queen key={piece.id} {...commonProps} />
+                    default:
+                        return null
+                }
             })}
 
         </group>

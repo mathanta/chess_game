@@ -5,10 +5,13 @@ export type BoardSquare = {
   isHighlighted: boolean
 }
 
+export type PieceType = 'pawn' | 'rook' | 'knight' | 'bishop' | 'queen' | 'king'
+
 export type PiecePosition = {
   id: string
   position: Position
   color: 'white' | 'black'
+  type: PieceType
 }
 
 export type BoardState = {

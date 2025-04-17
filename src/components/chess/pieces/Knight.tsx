@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Position } from '@/types/chess'
 
-function Pawn({ 
+function Knight({ 
   position, 
   color, 
   isSelected, 
@@ -33,7 +33,7 @@ function Pawn({
       onPointerEnter={() => setIsHovered(true)}
       onPointerLeave={() => setIsHovered(false)}
     >
-      {/* Base of pawn */}
+      {/* Base */}
       <cylinderGeometry args={[0.3, 0.4, 0.2, 8]} />
       <meshStandardMaterial 
         color={color} 
@@ -41,9 +41,9 @@ function Pawn({
         emissiveIntensity={isHovered || isSelected || isCaptureable ? 0.5 : 0}
       />
       
-      {/* Body of pawn */}
-      <mesh position={[0, 0.4, 0]}>
-        <cylinderGeometry args={[0.2, 0.3, 0.6, 8]} />
+      {/* Neck */}
+      <mesh position={[0, 0.5, 0]}>
+        <cylinderGeometry args={[0.2, 0.25, 0.6, 8]} />
         <meshStandardMaterial 
           color={color}
           emissive="yellow"
@@ -51,9 +51,29 @@ function Pawn({
         />
       </mesh>
       
-      {/* Head of pawn */}
-      <mesh position={[0, 0.8, 0]}>
-        <sphereGeometry args={[0.2, 16, 8]} />
+      {/* Head (angled) */}
+      <mesh position={[0, 0.8, 0.1]} rotation={[Math.PI * 0.15, 0, 0]}>
+        <cylinderGeometry args={[0.15, 0.2, 0.4, 8]} />
+        <meshStandardMaterial 
+          color={color}
+          emissive="yellow"
+          emissiveIntensity={isHovered || isSelected || isCaptureable ? 0.5 : 0}
+        />
+      </mesh>
+
+      {/* Snout */}
+      <mesh position={[0, 0.9, 0.2]}>
+        <boxGeometry args={[0.2, 0.2, 0.3]} />
+        <meshStandardMaterial 
+          color={color}
+          emissive="yellow"
+          emissiveIntensity={isHovered || isSelected || isCaptureable ? 0.5 : 0}
+        />
+      </mesh>
+
+      {/* Ears or top detail */}
+      <mesh position={[0, 1.1, 0]}>
+        <sphereGeometry args={[0.1, 16, 16]} />
         <meshStandardMaterial 
           color={color}
           emissive="yellow"
@@ -64,4 +84,4 @@ function Pawn({
   )
 }
 
-export default Pawn
+export default Knight

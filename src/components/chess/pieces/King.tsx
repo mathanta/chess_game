@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Position } from '@/types/chess'
 
-function Pawn({ 
+function King({ 
   position, 
   color, 
   isSelected, 
@@ -33,7 +33,7 @@ function Pawn({
       onPointerEnter={() => setIsHovered(true)}
       onPointerLeave={() => setIsHovered(false)}
     >
-      {/* Base of pawn */}
+      {/* Base of king */}
       <cylinderGeometry args={[0.3, 0.4, 0.2, 8]} />
       <meshStandardMaterial 
         color={color} 
@@ -41,20 +41,28 @@ function Pawn({
         emissiveIntensity={isHovered || isSelected || isCaptureable ? 0.5 : 0}
       />
       
-      {/* Body of pawn */}
+      {/* Body of king */}
       <mesh position={[0, 0.4, 0]}>
-        <cylinderGeometry args={[0.2, 0.3, 0.6, 8]} />
+        <cylinderGeometry args={[0.2, 0.3, 1.2, 8]} />
         <meshStandardMaterial 
           color={color}
           emissive="yellow"
           emissiveIntensity={isHovered || isSelected || isCaptureable ? 0.5 : 0}
         />
       </mesh>
-      
-      {/* Head of pawn */}
-      <mesh position={[0, 0.8, 0]}>
-        <sphereGeometry args={[0.2, 16, 8]} />
-        <meshStandardMaterial 
+
+      {/* Cross of king */}
+      <mesh position={[0, 1.2, 0]}>
+        <boxGeometry args={[0.1, 0.6, 0.1]} />
+        <meshStandardMaterial
+          color={color}
+          emissive="yellow"
+          emissiveIntensity={isHovered || isSelected || isCaptureable ? 0.5 : 0}
+        />
+      </mesh>
+      <mesh position={[0, 1.3, 0]}>
+        <boxGeometry args={[0.4, 0.1, 0.1]} />
+        <meshStandardMaterial
           color={color}
           emissive="yellow"
           emissiveIntensity={isHovered || isSelected || isCaptureable ? 0.5 : 0}
@@ -64,4 +72,4 @@ function Pawn({
   )
 }
 
-export default Pawn
+export default King
