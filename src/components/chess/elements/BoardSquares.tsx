@@ -1,12 +1,12 @@
-import { BoardState, Position } from '../state/types'
 import Square from '../Square'
+import { BoardState, Position } from '@/types/chess'
 
-type BoardSquaresProps = {
+interface BoardSquaresProps {
     boardState: BoardState
-    onSquareClick: (position: Position) => void
+    handleMove: (position: Position) => void
 }
 
-export function BoardSquares({ boardState, onSquareClick }: BoardSquaresProps) {
+export const BoardSquares = ({ boardState, handleMove }: BoardSquaresProps) => {
     return (
         <>
             {boardState.squares.map((row, i) =>
@@ -16,7 +16,7 @@ export function BoardSquares({ boardState, onSquareClick }: BoardSquaresProps) {
                         position={square.position}
                         color={(i + j) % 2 === 0 ? 'white' : 'grey'}
                         isHighlighted={square.isHighlighted}
-                        onClick={() => square.isHighlighted && onSquareClick(square.position)}
+                        onClick={() => square.isHighlighted && handleMove(square.position)}
                     />
                 ))
             )}
