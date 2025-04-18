@@ -1,13 +1,16 @@
-import { useState } from 'react'
-import { BoardState, Position, PiecePosition } from '@/types/chess'
+'use client'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { useRef, useState } from 'react'
+import { Mesh } from 'three'
 import Square from './Square'
 import Pawn from './pieces/Pawn'
 import Rook from './pieces/Rook'
 import Knight from './pieces/Knight'
 import Bishop from './pieces/Bishop'
-import King from './pieces/King'
 import Queen from './pieces/Queen'
+import King from './pieces/King'
 import { boardToPosition, getValidMoves } from '@/utils/chessLogic'
+import { Position, BoardState, PiecePosition } from '@/types/chess'
 
 function Board() {
     // Initialize 8x8 board with squares
@@ -53,7 +56,7 @@ function Board() {
             position: [-2.5, 0.1, 3.5] as Position,
             color: 'white' as const,
             type: 'knight' as const
-    },
+        },
         {
             id: 'white-bishop-0',
             position: [-1.5, 0.1, 3.5] as Position,
@@ -61,16 +64,16 @@ function Board() {
             type: 'bishop' as const
         },
         {
-            id: 'white-king',
-            position: [0.5, 0.1, 3.5] as Position,
-            color: 'white' as const,
-            type: 'king' as const
-        },
-        {
             id: 'white-queen',
             position: [-0.5, 0.1, 3.5] as Position,
             color: 'white' as const,
             type: 'queen' as const
+        },
+        {
+            id: 'white-king',
+            position: [0.5, 0.1, 3.5] as Position,
+            color: 'white' as const,
+            type: 'king' as const
         },
         {
             id: 'white-bishop-1',
@@ -85,7 +88,7 @@ function Board() {
             type: 'knight' as const
         },
         {
-            id: 'white-rook-1',
+            id: 'white-rook-ok-1',
             position: [3.5, 0.1, 3.5] as Position,
             color: 'white' as const,
             type: 'rook' as const
@@ -110,16 +113,16 @@ function Board() {
             type: 'bishop' as const
         },
         {
-            id: 'black-king',
+            id: 'black-queen',
             position: [-0.5, 0.1, -3.5] as Position,
             color: 'black' as const,
-            type: 'king' as const
+            type: 'queen' as const
         },
         {
-            id: 'black-queen',
+            id: 'black-king',
             position: [0.5, 0.1, -3.5] as Position,
             color: 'black' as const,
-            type: 'queen' as const
+            type: 'king' as const
         },
         {
             id: 'black-bishop-1',
@@ -143,6 +146,56 @@ function Board() {
 
     const [selectedPiece, setSelectedPiece] = useState<string | null>(null)
     const [currentTurn, setCurrentTurn] = useState<'white' | 'black'>('white')
+    const [animatingPiece, setAnimatingPiece] = useState<{
+        id: string,
+        startPos: Position,
+        endPos: Position,
+        progress: number
+    } | null>(null)
+
+    useFrame((state, delta) => {
+        if (animatingPiece) {
+            if (animatingPiece.progress >= 1) {
+                // Animation complete
+                setPieces(prev => prev.map(piece =>
+                    piece.id === animatingPiece.id
+                        ? { ...piece, position: animatingPiece.endPos }
+                        : piece
+                ))
+                setAnimatingPiece(null)
+                setSelectedPiece(null)
+                updateHighlights([])
+                setCurrentTurn(currentTurn === 'white' ? 'black' : 'white')
+                return
+            }
+
+            // Update animation progress
+            setAnimatingPiece(prev => {
+                if (!prev) return null
+                const newProgress = prev.progress + 0.05
+                const [startX, startY, startZ] = prev.startPos
+                const [endX, endY, endZ] = prev.endPos
+
+                // Calculate current position with jump
+                const jumpHeight = 2
+                const heightProgress = 4 * newProgress * (1 - newProgress)
+                const currentPos: Position = [
+                    startX + (endX - startX) * newProgress,
+                    startY + jumpHeight * heightProgress,
+                    startZ + (endZ - startZ) * newProgress
+                ]
+
+                // Update piece position during animation
+                setPieces(pieces => pieces.map(piece =>
+                    piece.id === prev.id
+                        ? { ...piece, position: currentPos }
+                        : piece
+                ))
+
+                return { ...prev, progress: newProgress }
+            })
+        }
+    })
 
     const updateHighlights = (validMoves: Position[]) => {
         const newBoard = initializeBoard()
@@ -171,30 +224,29 @@ function Board() {
     }
 
     const handleMove = (newPosition: Position) => {
-        if (!selectedPiece) return
+        if (!selectedPiece || animatingPiece) return
 
-        // Check for capture
+        const movingPiece = pieces.find(p => p.id === selectedPiece)
+        if (!movingPiece) return
+
+        // Start animation
+        setAnimatingPiece({
+            id: selectedPiece,
+            startPos: movingPiece.position,
+            endPos: newPosition,
+            progress: 0
+        })
+
+        // Handle capture
         const capturedPiece = pieces.find(piece =>
             piece.position[0] === newPosition[0] &&
             piece.position[2] === newPosition[2] &&
             piece.id !== selectedPiece
         )
 
-        // Remove captured piece if there is one
         if (capturedPiece) {
             setPieces(prev => prev.filter(piece => piece.id !== capturedPiece.id))
         }
-
-        // Move selected piece
-        setPieces(prev => prev.map(piece =>
-            piece.id === selectedPiece
-                ? { ...piece, position: newPosition }
-                : piece
-        ))
-
-        setSelectedPiece(null)
-        updateHighlights([])
-        setCurrentTurn(currentTurn === 'white' ? 'black' : 'white')
     }
 
     return (
@@ -204,8 +256,10 @@ function Board() {
                 position={[0, -0.1, 0]}
                 rotation={[-Math.PI / 2, 0, 0]}
                 onClick={() => {
-                    setSelectedPiece(null)
-                    updateHighlights([])
+                    if (!animatingPiece) {
+                        setSelectedPiece(null)
+                        updateHighlights([])
+                    }
                 }}
             >
                 <planeGeometry args={[10, 10]} />
@@ -243,27 +297,25 @@ function Board() {
                     color: piece.color,
                     isSelected: selectedPiece === piece.id,
                     onSelect: () => handlePieceSelect(piece.id),
-                    isCaptureable: isCaptureable,
-                    onCapture: () => handleMove(piece.position)
-                }
+                isCaptureable: isCaptureable,
+          onCapture: () => handleMove(piece.position)
+        }
 
-                switch (piece.type) {
-                    case 'pawn':
-                        return <Pawn key={piece.id} {...commonProps} />
-                    case 'rook':
-                        return <Rook key={piece.id} {...commonProps} />
-                    case 'knight':
-                        return <Knight key={piece.id} {...commonProps} />
-                    case 'bishop':
-                        return <Bishop key={piece.id} {...commonProps} />
-                    case 'king':
-                        return <King key={piece.id} {...commonProps} />
-                    case 'queen':
-                        return <Queen key={piece.id} {...commonProps} />
-                    default:
-                        return null
-                }
-            })}
+            switch (piece.type) {
+          case 'pawn':
+            return <Pawn key={piece.id} {...commonProps} />
+            case 'rook':
+            return <Rook key={piece.id} {...commonProps} />
+            case 'knight':
+            return <Knight key={piece.id} {...commonProps} />
+            case 'bishop':
+            return <Bishop key={piece.id} {...commonProps} />
+            case 'queen':
+            return <Queen key={piece.id} {...commonProps} />
+            case 'king':
+            return <King key={piece.id} {...commonProps} />
+        }
+      })}
 
         </group>
     )

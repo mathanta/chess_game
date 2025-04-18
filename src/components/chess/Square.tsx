@@ -14,7 +14,7 @@ function Square({ position, color, isHighlighted, onClick }: SquareProps) {
   return (
     <group onClick={onClick}>
       {/* Base square */}
-      <mesh 
+      <mesh
         position={position}
         onPointerEnter={() => setIsHovered(true)}
         onPointerLeave={() => setIsHovered(false)}
@@ -22,17 +22,17 @@ function Square({ position, color, isHighlighted, onClick }: SquareProps) {
         <boxGeometry args={[1, 0.1, 1]} />
         <meshBasicMaterial color={color} />
       </mesh>
-      
+
       {/* Highlight overlay */}
       {isHighlighted && (
-        <mesh 
+        <mesh
           position={[position[0], position[1] + 0.05, position[2]]}
           rotation={[-Math.PI / 2, 0, 0]}
         >
           <planeGeometry args={[1, 1]} />
-          <meshBasicMaterial 
-            color="yellow" 
-            transparent 
+          <meshBasicMaterial
+            color="yellow"
+            transparent
             opacity={isHovered ? 0.6 : 0.4}
             side={2}
           />
