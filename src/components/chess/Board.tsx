@@ -1,4 +1,3 @@
-// Board.tsx
 'use client'
 import { useFrame } from '@react-three/fiber'
 import { Position } from '@/types/chess'
