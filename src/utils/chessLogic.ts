@@ -84,7 +84,7 @@ export const getValidPawnMoves = (piece: PiecePosition, allPieces: PiecePosition
     }
   })
 
-  return moves.filter(([x, _, z]) => x >= -3.5 && x <= 3.5 && z >= -3.5 && z <= 3.5)
+  return moves.filter(([x, z]) => x >= -3.5 && x <= 3.5 && z >= -3.5 && z <= 3.5)
 }
 
 export const getValidRookMoves = (piece: PiecePosition, allPieces: PiecePosition[]): Position[] => {

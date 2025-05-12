@@ -1,8 +1,7 @@
-// state/useGameState.ts
 import { useState } from 'react'
 import { Position, PiecePosition } from '@/types/chess'
 import { initializeBoard, initialPieces } from '../logic/boardSetup'
-import { getValidMoves } from '@/utils/chessLogic'
+/*import { getValidMoves } from '@/utils/chessLogic'*/
 
 export const useGameState = () => {
     const [boardState, setBoardState] = useState(initializeBoard())

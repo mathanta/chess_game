@@ -21,7 +21,7 @@ function Board() {
         updateHighlights
     } = useGameState()
 
-    useFrame((state, delta) => {
+    useFrame((/*state, delta*/) => {
         if (animatingPiece) {
             if (animatingPiece.progress >= 1) {
                 setPieces(prev => prev.map(piece =>
@@ -40,7 +40,8 @@ function Board() {
                 if (!prev) return null
                 const newProgress = prev.progress + 0.05
                 const [startX, startY, startZ] = prev.startPos
-                const [endX, endY, endZ] = prev.endPos
+                const endX = prev.endPos[0]
+                const endZ = prev.endPos[2]
 
                 const jumpHeight = 2
                 const heightProgress = 4 * newProgress * (1 - newProgress)
@@ -105,7 +106,7 @@ function Board() {
 
     return (
         <group>
-            <BackgroundPlane 
+            <BackgroundPlane
                 onClick={() => {
                     if (!animatingPiece) {
                         setSelectedPiece(null)

@@ -39,9 +39,8 @@ export function useJumpAnimation(onComplete: () => void) {
 
     const p = jumpState.progress
     const [x1, y1, z1] = jumpState.startPos
-    const [x2, y2, z2] = jumpState.endPos
+    const [x2, /*y2,*/ z2] = jumpState.endPos
     
-    // Parabolic jump
     const jumpHeight = 2
     const heightOffset = jumpHeight * 4 * p * (1 - p)
 
